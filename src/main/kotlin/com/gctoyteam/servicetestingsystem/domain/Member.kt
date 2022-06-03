@@ -1,14 +1,16 @@
 package com.gctoyteam.servicetestingsystem.domain
 
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.AuthorityUtils
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import javax.management.relation.Role
 import javax.persistence.*
 
 @Entity
-@Table(name="member")
 class Member(
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="id", nullable = false)
     val id: Long? = null,
 
@@ -19,10 +21,18 @@ class Member(
     val memberPassword: String = "",
 
     @Column(name="member_name",nullable = false)
-    val memberName: String = "")
-    : UserDetails {
+    val memberName: String = "",
+
+    @ManyToMany
+    @JoinTable(name = "member_roles",
+        inverseJoinColumns = [JoinColumn(name = "role_name")],
+        joinColumns = [JoinColumn(name = "id")]
+    )
+    val roles: MutableSet<com.gctoyteam.servicetestingsystem.domain.Role> = mutableSetOf(),
+
+    ): UserDetails {
         override fun getAuthorities(): MutableCollection<out GrantedAuthority>? {
-            return null
+            return roles.flatMap { it.authorities }.map { SimpleGrantedAuthority(it.authorityName)}.toMutableSet()
         }
         override fun getPassword(): String {
             return memberPassword
