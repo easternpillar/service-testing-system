@@ -1,17 +1,17 @@
 package com.gctoyteam.servicetestingsystem.security
 
 import com.gctoyteam.servicetestingsystem.service.CustomUserDetailsService
-import io.jsonwebtoken.Header
+import io.jsonwebtoken.Jwt
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
-import java.security.Key
 import java.util.*
 import javax.annotation.PostConstruct
 import javax.crypto.SecretKey
-import kotlin.math.exp
 
 @Component
 class JwtTokenProvider() {
@@ -26,8 +26,27 @@ class JwtTokenProvider() {
     }
 
     fun createToken(memberId:String):String{
-        val claims= Jwts.claims().setSubject(memberId)
+        val claims= Jwts.claims().setSubject("auth")
         val now=Date()
-        return Jwts.builder().setHeaderParam("typ","JWT").setClaims(claims).setIssuedAt(now).setExpiration(Date(expTime+now.time)).signWith(secretKey).compact()
+        return Jwts.builder().setHeaderParam("typ","JWT").setSubject(memberId).claim("role","ROLE_USER").setIssuedAt(now).setExpiration(Date(expTime+now.time)).signWith(secretKey).compact()
+    }
+
+    fun getMemberId(token:String):String{
+        return Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token).body.subject
+    }
+    fun validateToken(token: String): Boolean {
+        try {
+            Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token)
+        }catch (ex: java.lang.Exception){
+            return false
+        }
+        return true
+    }
+
+    fun getAuthentication(token: String): JwtAuthentication {
+        val parsed=Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token)
+        return JwtAuthentication(getMemberId(token), null, mutableSetOf<GrantedAuthority>().also {
+            it.add(SimpleGrantedAuthority(parsed.body["role"].toString()))
+        } )
     }
 }
