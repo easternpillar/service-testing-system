@@ -7,11 +7,9 @@ import com.gctoyteam.servicetestingsystem.dto.RegisterDto
 import com.gctoyteam.servicetestingsystem.repository.MemberRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.core.userdetails.UsernameNotFoundException
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import kotlin.math.log
 
 @Service
 @Transactional
@@ -35,7 +33,7 @@ class CustomUserDetailsService(private val memberRepository: MemberRepository, p
         val findMember = memberRepository.findByMemberId(loginDto.memberId) ?: return false
         return passwordEncoder.matches(loginDto.memberPassword,findMember.memberPassword)
     }
-
+    @Transactional(readOnly = true)
     fun findMembers():List<Member>{
         return memberRepository.findAll()
     }

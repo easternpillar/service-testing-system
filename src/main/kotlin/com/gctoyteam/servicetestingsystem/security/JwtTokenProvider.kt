@@ -28,7 +28,7 @@ class JwtTokenProvider() {
     fun createToken(memberId:String):String{
         val claims= Jwts.claims().setSubject("auth")
         val now=Date()
-        return Jwts.builder().setHeaderParam("typ","JWT").setSubject(memberId).claim("role","ROLE_USER").setIssuedAt(now).setExpiration(Date(expTime+now.time)).signWith(secretKey).compact()
+        return Jwts.builder().setHeaderParam("typ","JWT").setSubject(memberId).claim("roles","ROLE_ADMIN").setIssuedAt(now).setExpiration(Date(expTime+now.time)).signWith(secretKey).compact()
     }
 
     fun getMemberId(token:String):String{
@@ -43,10 +43,14 @@ class JwtTokenProvider() {
         return true
     }
 
-    fun getAuthentication(token: String): JwtAuthentication {
-        val parsed=Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token)
-        return JwtAuthentication(getMemberId(token), null, mutableSetOf<GrantedAuthority>().also {
-            it.add(SimpleGrantedAuthority(parsed.body["role"].toString()))
-        } )
+    fun getAuthentication(token: String?): JwtAuthentication {
+        if (token!=null) {
+            val parsed = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(token)
+            return JwtAuthentication(getMemberId(token), null, mutableSetOf<GrantedAuthority>().also {
+                it.add(SimpleGrantedAuthority(parsed.body["roles"].toString()))
+            })
+        } else{
+            return JwtAuthentication("GUEST",null, mutableSetOf<GrantedAuthority>().apply { this.add(SimpleGrantedAuthority("GUEST")) })
+        }
     }
 }

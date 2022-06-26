@@ -14,22 +14,18 @@ class JwtAuthenticationFilter(private val jwtTokenProvider: JwtTokenProvider): G
     private val log=LoggerFactory.getLogger("log")
     override fun doFilter(request: ServletRequest, response: ServletResponse, chain: FilterChain) {
         val req = request as HttpServletRequest
-        val res=response as HttpServletResponse
+//        val res=response as HttpServletResponse
         val token = req.cookies?.associateBy({ it.name }, { it.value })?.get("Authorization")
         log.info(token)
-
+        log
         if (token!=null && jwtTokenProvider.validateToken(token)){
             log.info("토큰 유효")
             SecurityContextHolder.createEmptyContext().authentication=jwtTokenProvider.getAuthentication(token)
             log.info(jwtTokenProvider.getMemberId(token))
         }
         else{
-            if (token==null){
-                req.setAttribute("UNAUTHORIZATION","토큰 없음")
+            SecurityContextHolder.createEmptyContext().authentication=jwtTokenProvider.getAuthentication(token)
             }
-            else request.setAttribute("UNAUTHORIZATION","토큰 만료")
-        }
-
         chain.doFilter(request,response)
     }
 }

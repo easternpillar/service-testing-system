@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 class SecurityConfig(private val jwtTokenProvider: JwtTokenProvider) {
     @Bean
-    fun passwordEncoder():BCryptPasswordEncoder=BCryptPasswordEncoder()
+    fun passwordEncoder():PasswordEncoder=NoOpPasswordEncoder.getInstance()
     @Bean
     fun filterChain(http:HttpSecurity):SecurityFilterChain{
         return http
@@ -34,7 +34,7 @@ class SecurityConfig(private val jwtTokenProvider: JwtTokenProvider) {
                 .authorizeRequests()
 //                    .antMatchers("/signup", "/signin").hasAuthority("AccessGuest")
                     .antMatchers("/signup", "/signin").permitAll()
-                    .antMatchers("/admin/**").hasAuthority("ROLE_ADMIN") // hasAuthority("Role_Admin")
+                    .antMatchers("/admin/**").hasRole("ADMIN") // hasAuthority("Role_Admin")
 //                    .antMatchers("/**").hasAuthority("AccessUser")
                     .anyRequest().authenticated()
             .and()
