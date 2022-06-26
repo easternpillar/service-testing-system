@@ -7,7 +7,7 @@ class Role {
     @Id
     var roleName:String=""
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "role_authority",
         inverseJoinColumns = [JoinColumn(name = "id")],
     joinColumns = [JoinColumn(name = "role_name")]

@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 @Transactional
-class CustomUserDetailsService(private val memberRepository: MemberRepository, private val passwordEncoder: BCryptPasswordEncoder):UserDetailsService {
+class CustomUserDetailsService(private val memberRepository: MemberRepository, private val passwordEncoder: PasswordEncoder):UserDetailsService {
     @Transactional(readOnly = true)
     override fun loadUserByUsername(memberId: String): UserDetails? {
         return memberRepository.findByMemberId(memberId)

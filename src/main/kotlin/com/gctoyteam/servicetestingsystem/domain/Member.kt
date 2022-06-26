@@ -23,7 +23,7 @@ class Member(
     @Column(name="member_name",nullable = false)
     val memberName: String = "",
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "member_roles",
         inverseJoinColumns = [JoinColumn(name = "role_name")],
         joinColumns = [JoinColumn(name = "id")]

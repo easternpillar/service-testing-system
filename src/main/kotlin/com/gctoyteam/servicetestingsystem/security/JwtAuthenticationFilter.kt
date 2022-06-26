@@ -19,9 +19,10 @@ class JwtAuthenticationFilter(private val jwtTokenProvider: JwtTokenProvider): G
         log.info(token)
         log
         if (token!=null && jwtTokenProvider.validateToken(token)){
+            SecurityContextHolder.getContext().authentication = jwtTokenProvider.getAuthentication(token)
             log.info("토큰 유효")
-            SecurityContextHolder.createEmptyContext().authentication=jwtTokenProvider.getAuthentication(token)
             log.info(jwtTokenProvider.getMemberId(token))
+            log.info(SecurityContextHolder.getContext().authentication.toString())
         }
         else{
             SecurityContextHolder.createEmptyContext().authentication=jwtTokenProvider.getAuthentication(token)
