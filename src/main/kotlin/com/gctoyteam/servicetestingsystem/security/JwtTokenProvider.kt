@@ -1,20 +1,17 @@
 package com.gctoyteam.servicetestingsystem.security
 
-import com.gctoyteam.servicetestingsystem.service.CustomUserDetailsService
-import io.jsonwebtoken.Jwt
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component
 import java.util.*
 import javax.annotation.PostConstruct
 import javax.crypto.SecretKey
 
 @Component
-class JwtTokenProvider() {
+class JwtTokenProvider {
     private val expTime=1000L*60*60
     @Value(value = "\${secretKey}")
     private var key = ""
